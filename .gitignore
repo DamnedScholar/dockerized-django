@@ -5,3 +5,10 @@ __pycache
 .env.dev
 .env.prod
 .env.prod.db
+
+# Ignore folders used by the Dropbox container.
+.dropbox
+Dropbox
+
+# Ignore the actual app folder.
+app

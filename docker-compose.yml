@@ -6,11 +6,11 @@ volumes:
 
 services:
   # db:
+  #   image: postgis/postgis
+  #   container_name: postgres-postgis
   #   build: 
   #     context: ./postgres-postgis
   #     dockerfile: Dockerfile
-  #   image: postgis/postgis
-  #   container_name: postgres-postgis
   #   volumes:
   #     - postgres:/var/lib/postgresql/data
   #     - ./backups:/opt/backups
@@ -20,21 +20,34 @@ services:
   #     - '5432:5432'
   #   env_file: ./postgres-postgis/.env
   #   restart: on-failure
+  gunicorn:
+    container_name: gunicorn
+    build:
+      context: .
+      dockerfile: gunicorn.dockerfile
+    environment:
+      - APP_MODULE=conf.wsgi
+      - GDAL_LIBRARY_PATH=/install/gdal-3.2.1
+    volumes:
+      - ./app:/app
+    tmpfs:
+      - /tmp
   server:
+    image: caddy
+    container_name: caddy
     build:
       context: ./caddy
       dockerfile: Dockerfile
-    image: caddy
-    container_name: caddy
-    ports:
-      - "80:80"
-      - "443:443"
-      - "2019:2019"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - $STATIC_PATH:/srv/app/static
+      - ./Dropbox:/srv/app/static/Dropbox
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"
   # pgadmin:
   #   image: dpage/pgadmin4
   #   container_name: pgadmin
@@ -50,12 +63,24 @@ services:
   #   ports:
   #     - "8080:8080"
   #   env_file: ./imgproxy/.env
+  # dropbox:
+  #   image: otherguy/dropbox
+  #   container_name: dropbox
+  #   restart: always
+  #   environment:
+  #     - DROPBOX_UID
+  #     - DROPBOX_GID
+  #   volumes:
+  #     - ./Dropbox:/opt/dropbox/Dropbox
+  #     - ./.dropbox:/opt/dropbox/.dropbox
+  #     - /etc/timezone:/etc/timezone
+  #     - /etc/localtime:/etc/localtime
   # splash:
   #   image: scrapinghub/splash
   #   container_name: splash
   #   ports:
   #     - "8050:8050"
 
-# networks:
-#   postgres_conn:
-#     driver: bridge
+networks:
+  postgres_conn:
+    driver: bridge

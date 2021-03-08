@@ -1,3 +1,13 @@
 localhost {
-    reverse_proxy localhost:8000
+    route {
+        file_server /static/* browse {
+            root /srv/app
+        }
+
+        reverse_proxy host.docker.internal:8000
+    }
+    
+    log {
+        output stdout
+    }
 }
