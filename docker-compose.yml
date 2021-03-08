@@ -5,33 +5,33 @@ volumes:
   caddy_config:
 
 services:
-  # db:
-  #   image: postgis/postgis
-  #   container_name: postgres-postgis
-  #   build: 
-  #     context: ./postgres-postgis
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - postgres:/var/lib/postgresql/data
-  #     - ./backups:/opt/backups
-  #   networks:
-  #     - postgres_conn
-  #   ports:
-  #     - '5432:5432'
-  #   env_file: ./postgres-postgis/.env
-  #   restart: on-failure
-  gunicorn:
-    container_name: gunicorn
-    build:
-      context: .
-      dockerfile: gunicorn.dockerfile
-    environment:
-      - APP_MODULE=conf.wsgi
-      - GDAL_LIBRARY_PATH=/install/gdal-3.2.1
+  db:
+    image: postgis/postgis
+    container_name: postgres-postgis
+    build: 
+      context: ./postgres-postgis
+      dockerfile: Dockerfile
     volumes:
-      - ./app:/app
-    tmpfs:
-      - /tmp
+      - postgres:/var/lib/postgresql/data
+      - ./backups:/opt/backups
+    networks:
+      - postgres_conn
+    ports:
+      - '5432:5432'
+    env_file: ./postgres-postgis/.env
+    restart: on-failure
+  # gunicorn:
+  #   container_name: gunicorn
+  #   build:
+  #     context: .
+  #     dockerfile: gunicorn.dockerfile
+  #   environment:
+  #     - APP_MODULE=conf.wsgi
+  #     - GDAL_LIBRARY_PATH=/install/gdal-3.2.1
+  #   volumes:
+  #     - ./app:/app
+  #   tmpfs:
+  #     - /tmp
   server:
     image: caddy
     container_name: caddy
@@ -48,33 +48,33 @@ services:
       - "80:80"
       - "443:443"
       - "2019:2019"
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   depends_on:
-  #     - db
-  #   ports:
-  #     - "5051:80"
-  #   env_file: ./postgres-postgis/.env
-  #   restart: on-failure
-  # imgproxy:
-  #   image: darthsim/imgproxy
-  #   container_name: imgproxy
-  #   ports:
-  #     - "8080:8080"
-  #   env_file: ./imgproxy/.env
-  # dropbox:
-  #   image: otherguy/dropbox
-  #   container_name: dropbox
-  #   restart: always
-  #   environment:
-  #     - DROPBOX_UID
-  #     - DROPBOX_GID
-  #   volumes:
-  #     - ./Dropbox:/opt/dropbox/Dropbox
-  #     - ./.dropbox:/opt/dropbox/.dropbox
-  #     - /etc/timezone:/etc/timezone
-  #     - /etc/localtime:/etc/localtime
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    depends_on:
+      - db
+    ports:
+      - "5051:80"
+    env_file: ./postgres-postgis/.env
+    restart: on-failure
+  imgproxy:
+    image: darthsim/imgproxy
+    container_name: imgproxy
+    ports:
+      - "8080:8080"
+    env_file: ./imgproxy/.env
+  dropbox:
+    image: otherguy/dropbox
+    container_name: dropbox
+    restart: always
+    environment:
+      - DROPBOX_UID
+      - DROPBOX_GID
+    volumes:
+      - ./Dropbox:/opt/dropbox/Dropbox
+      - ./.dropbox:/opt/dropbox/.dropbox
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
   # splash:
   #   image: scrapinghub/splash
   #   container_name: splash

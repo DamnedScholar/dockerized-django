@@ -6,16 +6,16 @@ FROM tiangolo/meinheld-gunicorn:python3.8-2020-12-06
 #     software-properties-common
 
 # Install geospatial libraries
-RUN apt-get update \
-    && apt-get install -y \
-    gdal-bin \
-    libgdal-dev \
-    python-gdal
+# RUN apt-get update \
+#     && apt-get install -y \
+#     gdal-bin \
+#     libgdal-dev \
+#     python-gdal
 
-ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
-ENV C_INCLUDE_PATH=/usr/include/gdal
+# ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+# ENV C_INCLUDE_PATH=/usr/include/gdal
 
-RUN pip install GDAL
+# RUN pip install GDAL
 
 # We keep all build scripts and non-Python dependencies in here.
 COPY ./app/install /install
