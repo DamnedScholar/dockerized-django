@@ -7,18 +7,18 @@ volumes:
 services:
   db:
     image: postgis/postgis
-    container_name: postgres-postgis
+    container_name: postgis
     build: 
-      context: ./postgres-postgis
+      context: ./postgis
       dockerfile: Dockerfile
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - ./._db:/var/lib/postgresql/data
       - ./backups:/opt/backups
-    networks:
-      - postgres_conn
+    # networks:
+      # - cstreet
     ports:
       - '5432:5432'
-    env_file: ./postgres-postgis/.env
+    env_file: ./postgis/.env
     restart: on-failure
   # gunicorn:
   #   container_name: gunicorn
@@ -32,55 +32,88 @@ services:
   #     - ./app:/app
   #   tmpfs:
   #     - /tmp
+    # networks:
+    #   - cstreet
   server:
     image: caddy
     container_name: caddy
-    build:
-      context: ./caddy
-      dockerfile: Dockerfile
     volumes:
       - caddy_data:/data
       - caddy_config:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - $STATIC_PATH:/srv/app/static
       - ./Dropbox:/srv/app/static/Dropbox
+    # networks:
+      # - cstreet
     ports:
       - "80:80"
       - "443:443"
       - "2019:2019"
+    restart: always
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    # container_name: pgadmin
     depends_on:
       - db
+    # networks:
+      # - cstreet
     ports:
       - "5051:80"
-    env_file: ./postgres-postgis/.env
+    env_file: ./postgis/.env
     restart: on-failure
-  imgproxy:
-    image: darthsim/imgproxy
-    container_name: imgproxy
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    # networks:
+      # - cstreet
     ports:
-      - "8080:8080"
-    env_file: ./imgproxy/.env
-  dropbox:
-    image: otherguy/dropbox
-    container_name: dropbox
+      - "5672:5672"
+    env_file: ./rabbitmq/.env
     restart: always
-    environment:
-      - DROPBOX_UID
-      - DROPBOX_GID
-    volumes:
-      - ./Dropbox:/opt/dropbox/Dropbox
-      - ./.dropbox:/opt/dropbox/.dropbox
-      - /etc/timezone:/etc/timezone
-      - /etc/localtime:/etc/localtime
+  shynet:
+    image: milesmcc/shynet
+    container_name: shynet
+    # networks:
+      # - cstreet
+    env_file: ./shynet/.env
+    restart: always
+  redis:
+    image: redis
+    container_name: redis
+    # networks:
+      # - cstreet
+    env_file: ./redis/.env
+    restart: always
+  # imgproxy:
+  #   image: darthsim/imgproxy
+  #   container_name: imgproxy
+    # networks:
+    #   - cstreet
+  #   ports:
+  #     - "8080:8080"
+  #   env_file: ./imgproxy/.env
+  # dropbox:
+  #   image: otherguy/dropbox
+  #   container_name: dropbox
+  #   environment:
+  #     - DROPBOX_UID
+  #     - DROPBOX_GID
+  #   volumes:
+  #     - ./Dropbox:/opt/dropbox/Dropbox
+  #     - ./.dropbox:/opt/dropbox/.dropbox
+  #     - /etc/timezone:/etc/timezone
+  #     - /etc/localtime:/etc/localtime
+    # networks:
+    #   - cstreet
+  #   restart: always
   # splash:
   #   image: scrapinghub/splash
   #   container_name: splash
+    # networks:
+    #   - cstreet
   #   ports:
   #     - "8050:8050"
 
-networks:
-  postgres_conn:
-    driver: bridge
+# networks:
+#   cstreet:
+#     driver: bridge
