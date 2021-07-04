@@ -3,6 +3,9 @@ localhost {
         file_server /static/* browse {
             root /srv/app
         }
+        file_server /media/* browse {
+            root /srv/app
+        }
 
         reverse_proxy host.docker.internal:8000
     }

@@ -1,6 +1,6 @@
 version: '3.8'
 volumes:
-  postgres:
+  postgis:
   caddy_data:
   caddy_config:
 
@@ -12,7 +12,7 @@ services:
       context: ./postgis
       dockerfile: Dockerfile
     volumes:
-      - ./._db:/var/lib/postgresql/data
+      - postgis:/var/lib/postgresql/data
       - ./backups:/opt/backups
     # networks:
       # - cstreet
@@ -42,6 +42,7 @@ services:
       - caddy_config:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - $STATIC_PATH:/srv/app/static
+      - $MEDIA_PATH:/srv/app/media
       - ./Dropbox:/srv/app/static/Dropbox
     # networks:
       # - cstreet
@@ -52,7 +53,7 @@ services:
     restart: always
   pgadmin:
     image: dpage/pgadmin4
-    # container_name: pgadmin
+    container_name: pgadmin
     depends_on:
       - db
     # networks:
@@ -80,6 +81,8 @@ services:
   redis:
     image: redis
     container_name: redis
+    ports:
+      - 6379:6379
     # networks:
       # - cstreet
     env_file: ./redis/.env

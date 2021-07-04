@@ -15,7 +15,7 @@ RUN apt-get update \
   unzip \
   make \
   && cd /opt/apps \
-  && unzip pgsql-addressing-dictionary.zip \
+  && unzip -f pgsql-addressing-dictionary.zip \
   && cd pgsql-addressing-dictionary \
   && make install \
   && apt-get purge -y --auto-remove postgresql-server-dev-$PG_MAJOR make unzip
@@ -30,7 +30,7 @@ RUN chmod +x /opt/pgbackup.sh
 
 # add init script
 RUN mkdir -p /docker-entrypoint-initdb.d
-COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/1_postgis.sh
 
 # create volume for backups
 VOLUME ["/opt/backups"]

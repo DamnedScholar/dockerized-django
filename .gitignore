@@ -1,3 +1,4 @@
+.*
 *.pyc
 __pycache
 .DS_Store
@@ -12,3 +13,6 @@ Dropbox
 
 # Ignore the actual app folder.
 app
+
+# And folders that might contain sensitive information.
+backups
